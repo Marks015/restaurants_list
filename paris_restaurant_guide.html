@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paris Restaurant Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6f0;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff66b2;
+            text-align: center;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-bar input, .search-bar select {
+            padding: 10px;
+            margin: 5px;
+            font-size: 1em;
+            border: 2px solid #ff66b2;
+            border-radius: 8px;
+        }
+        .restaurant-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .restaurant-card {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ff66b2;
+            border-radius: 8px;
+        }
+        .category-title {
+            color: #ff66b2;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Paris Restaurant Guide</h1>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" onkeyup="filterRestaurants()" placeholder="Search for restaurants..." title="Type in a name">
+        <select id="categorySelect" onchange="filterRestaurants()">
+            <option value="">All Categories</option>
+            <!-- JavaScript will populate categories here -->
+        </select>
+    </div>
+
+    <div class="restaurant-list" id="restaurantList">
+        <!-- JavaScript will populate restaurant data here -->
+    </div>
+
+    <script>
+        const data = {
+    "Brasserie": [
+        { "name": "Brasserie d’Auteuil 16e", "rating": "4.1", "address": "78 Rue d'Auteuil, 75016 Paris, France", "price": "$$" },
+        { "name": "Café bohème 14e", "rating": "4.1", "address": "19 Bd Edgar Quinet, 75014 Paris, France", "price": "$$" },
+        { "name": "Maison sauvage 6e 16e", "rating": "3.9", "address": "5 Pl. Victor Hugo, 75116 Paris, France", "price": "No price level available" },
+        { "name": "Frame Brasserie 15e", "rating": "4.2", "address": "22 Rue Jean Rey, 75015 Paris, France", "price": "$$" },
+        { "name": "La Maison rose 18e", "rating": "4.1", "address": "2 Rue de l'Abreuvoir, 75018 Paris, France", "price": "$$" },
+        { "name": "Brasserie Rosie 11e", "rating": "4.7", "address": "53 Rue du Faubourg Saint-Antoine, 75011 Paris, France", "price": "$$" },
+        { "name": "Mon Coco Republique 11e", "rating": "3.9", "address": "6 Pl. de la République, 75011 Paris, France", "price": "$$" },
+        { "name": "Madame Pampa 14e", "rating": "3.9", "address": "64 Rue du Montparnasse, 75014 Paris, France", "price": "No price level available" },
+        { "name": "Le Brebant 9e", "rating": "3.4", "address": "32 Bd Poissonnière, 75009 Paris, France", "price": "$$$" },
+        { "name": "La coupole 14e", "rating": "4.4", "address": "102 Bd du Montparnasse, 75014 Paris, France", "price": "$$$" },
+        { "name": "Polpo Brasserie Levallois", "rating": "4.2", "address": "47 Quai Charles Pasqua, 92300 Levallois-Perret, France", "price": "$$" },
+        { "name": "Le Campanella 7e", "rating": "4.3", "address": "18 Av. Bosquet, 75007 Paris, France", "price": "$$" },
+        { "name": "Bofinger 4e", "rating": "4.3", "address": "5-7 Rue de la Bastille, 75004 Paris, France", "price": "$$" },
+        { "name": "Café Bastille 4e", "rating": "4.8", "address": "42 Bd Henri IV, 75004 Paris, France", "price": "No price level available" },
+        { "name": "Brasserie Vaudeville 2e", "rating": "4.4", "address": "29 Rue Vivienne, 75002 Paris, France", "price": "$$" },
+        { "name": "Chez Francis 8e", "rating": "3.6", "address": "7 Pl. de l'Alma, 75008 Paris, France", "price": "$$$" },
+    ],
+    "Fusion": [
+        { "name": "Uma Nota 2e", "rating": "4.1", "address": "86 Rue Réaumur, 75002 Paris, France", "price": "$$" },
+        { "name": "Mamma Cita 9e", "rating": "4.7", "address": "20bis Rue de Douai, 75009 Paris, France", "price": "$$" },
+        { "name": "ACA Pigalle 9e", "rating": "4.5", "address": "48 Bd de Clichy, 75018 Paris, France", "price": "$$" },
+        { "name": "Moloko 9e", "rating": "3.7", "address": "26 Rue Pierre Fontaine, 75009 Paris, France", "price": "$$" },
+        { "name": "Mikuna", "rating": "4.4", "address": "57 Rue de Miromesnil, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Mamma Mia", "rating": "3.7", "address": "5 bis Rue Vernet, 75008 Paris, France", "price": "$$$" },
+        { "name": "Verde 8e", "rating": "3.3", "address": "24 Av. George V, 75008 Paris, France", "price": "$$$" },
+        { "name": "Sinner", "rating": "4.1", "address": "116 Rue du Temple, 75003 Paris, France", "price": "No price level available" },
+    ],
+    "Fancy": [
+        { "name": "Alcazar Restaurant 6e", "rating": "4.2", "address": "62 Rue Mazarine, 75006 Paris, France", "price": "$$$" },
+        { "name": "The Cod House 6e", "rating": "4.6", "address": "1 Rue de Condé, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Coco Palais Garnier 5e", "rating": "3.5", "address": "Palais Garnier, 1 Pl. Jacques Rouché, 75009 Paris, France", "price": "$$$$" },
+        { "name": "Loulou 1er", "rating": "4.1", "address": "107 Rue de Rivoli, 75001 Paris, France", "price": "$$$" },
+        { "name": "Mun 8e", "rating": "3.9", "address": "52 Av. des Champs-Élysées, 75008 Paris, France", "price": "$$$$" },
+        { "name": "Coya 7e", "rating": "3.8", "address": "83-85 Rue du Bac, 75007 Paris, France", "price": "$$$$" },
+        { "name": "Les jardins du Presbourg 16e", "rating": "4.3", "address": "3 Av. de la Grande Armée, 75116 Paris, France", "price": "No price level available" },
+        { "name": "Monsieur Bleu 7e", "rating": "4", "address": "Palais De Tokyo, 20 Av. de New York, 75116 Paris, France", "price": "$$$$" },
+        { "name": "Manko 8e", "rating": "3.5", "address": "15 Av. Montaigne, 75008 Paris, France", "price": "$$$" },
+        { "name": "Perruche 9e", "rating": "4.1", "address": "Printemps De L'Homme, 2 Rue du Havre 9ème étage, 75009 Paris, France", "price": "$$$$" },
+        { "name": "Kong 1er", "rating": "3.7", "address": "1 Rue du Pont Neuf, 75001 Paris, France", "price": "$$$$" },
+        { "name": "Girafe 16e", "rating": "3.9", "address": "1 Pl. du Trocadéro et du 11 Novembre, 75016 Paris, France", "price": "No price level available" },
+        { "name": "Matsuhisa Nobu 8e", "rating": "4.3", "address": "37 Av. Hoche, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Kinugawa 1er", "rating": "4.2", "address": "9 Rue du Mont Thabor, 75001 Paris, France", "price": "$$$$" },
+        { "name": "Beefbar 8e", "rating": "4", "address": "5 Rue Marbeuf, 75008 Paris, France", "price": "$$$$" },
+        { "name": "Sinner 3e", "rating": "4.1", "address": "116 Rue du Temple, 75003 Paris, France", "price": "No price level available" },
+        { "name": "Le Stresa 8e", "rating": "3.9", "address": "7 Rue Chambiges, 75008 Paris, France", "price": "$$$$" },
+        { "name": "Yakuza", "rating": "4.6", "address": "7 Rue du Helder, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Terra 3e", "rating": "4.6", "address": "21 Rue des Gravilliers, 75003 Paris, France", "price": "No price level available" },
+        { "name": "Matignon 8e", "rating": "3.6", "address": "3 Av. Matignon, 75008 Paris, France", "price": "$$$$" },
+        { "name": "César 8e", "rating": "3.7", "address": "12 Av. de Wagram, 75008 Paris, France", "price": "$$" },
+    ],
+    "Burgers": [
+        { "name": "PNY", "rating": "4.4", "address": "1 Rue Perrée, 75003 Paris, France", "price": "$$" },
+        { "name": "Le Ruisseau", "rating": "4.5", "address": "22 Rue Rambuteau, 75003 Paris, France", "price": "$" },
+        { "name": "Blossom Burgers", "rating": "4.7", "address": "26 Rue de Chabrol, 75010 Paris, France", "price": "No price level available" },
+        { "name": "Sold Out Burger", "rating": "4.6", "address": "2 Rue Lucien Sampaix, 75010 Paris, France", "price": "No price level available" },
+        { "name": "Père et Fish 9e", "rating": "4.6", "address": "67 Rue du Faubourg Poissonnière, 75009 Paris, France", "price": "$$" },
+        { "name": "Crispy Soul 11e 15e", "rating": "4.7", "address": "101 Rue Brancion, 75015 Paris, France", "price": "$$" },
+        { "name": "Cot Cot 9e", "rating": "4.3", "address": "Au Garage a Velos, 21 Rue Gérando, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Buns 5e 19e", "rating": "4.6", "address": "165 Av. Jean Jaurès, 75019 Paris, France", "price": "No price level available" },
+        { "name": "Dumbo 16e 9e", "rating": "4.4", "address": "64 Rue Jean-Baptiste Pigalle, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Smash it 15e", "rating": "4.2", "address": "3 Rue de l'Avre, 75015 Paris, France", "price": "No price level available" },
+        { "name": "Street Bangkok 9e", "rating": "4.5", "address": "28 Rue de Douai, 75009 Paris, France", "price": "$$" },
+        { "name": "Smatch 13e", "rating": "4.4", "address": "08 Rue du Père Guérin, 75013 Paris, France", "price": "No price level available" },
+        { "name": "Le Camion qui Fume", "rating": "4.6", "address": "6 Rue Grégoire de Tours, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Naked Burger 6e", "rating": "4.4", "address": "1 Rue de l'Ancienne Comédie, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Mangez et cassez-vous 2e", "rating": "4.6", "address": "64 Rue Alexandre Dumas, 75011 Paris, France", "price": "$" },
+        { "name": "Meatpacking 8e", "rating": "4.5", "address": "40 Rue de Berri, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Manhattn’s burgers", "rating": "4.6", "address": "59 Rue Montorgueil 59, 75002 Paris, France", "price": "$$" },
+        { "name": "ABC fried chicken", "rating": "3.3", "address": "13 Rue Latérale, 92400 Courbevoie, France", "price": "No price level available" },
+        { "name": "Le Clercq Roi des frites 2e", "rating": "4", "address": "169 Rue Montmartre, 75002 Paris, France", "price": "No price level available" },
+        { "name": "Melt 17e", "rating": "4.7", "address": "83 Rue Legendre, 75017 Paris, France", "price": "$$" },
+    ],
+    "Italian restaurants": [
+        { "name": "Guise trattoria", "rating": "4.3", "address": "125 Rue du Faubourg Saint-Honoré, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Pizzeria Popolare", "rating": "4.7", "address": "111 Rue Réaumur, 75002 Paris, France", "price": "$" },
+        { "name": "Pink Mamma", "rating": "4.7", "address": "20bis Rue de Douai, 75009 Paris, France", "price": "$$" },
+        { "name": "Mama primi 17e", "rating": "4.7", "address": "18 Rue Boursault, 75017 Paris, France", "price": "$$" },
+        { "name": "Daroco 16e", "rating": "4.3", "address": "3 Pl. Clément Ader, 75016 Paris, France", "price": "$$$" },
+        { "name": "Meglio Pasta 9eLove Juyi", "rating": "Not found", "address": "Not found", "price": "Not found" },
+        { "name": "Casa Di Peppe 5e", "rating": "4.6", "address": "222 Rue Saint-Jacques, 75005 Paris, France", "price": "$$" },
+        { "name": "Gruppo Dalmata 2e 11e", "rating": "4.6", "address": "8 Rue Tiquetonne, 75002 Paris, France", "price": "$$" },
+        { "name": "Bricktop Pizza 10e", "rating": "4.5", "address": "153 Quai de Valmy, 75010 Paris, France", "price": "$" },
+        { "name": "Big love", "rating": "4.6", "address": "30 Rue Debelleyme, 75003 Paris, France", "price": "$$" },
+        { "name": "Pendino 1e", "rating": "4.2", "address": "6 Rue de l'Échelle, 75001 Paris, France", "price": "No price level available" },
+        { "name": "Epoca 15e", "rating": "4.4", "address": "17 Rue Oudinot, 75007 Paris, France", "price": "$$" },
+        { "name": "La manifattura 15e", "rating": "4.2", "address": "106 Bd du Montparnasse, 75014 Paris, France", "price": "$$" },
+        { "name": "Noto 8e", "rating": "3.8", "address": "252 bis Rue du Faubourg Saint-Honoré, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Marcello 8e", "rating": "4.5", "address": "8 Rue Mabillon, 75006 Paris, France", "price": "$$$" },
+    ],
+    "Sushi": [
+        { "name": "Blueberry Maki Bar 6e", "rating": "4.5", "address": "6 Rue du Sabot, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Kong 1er", "rating": "3.7", "address": "1 Rue du Pont Neuf, 75001 Paris, France", "price": "$$$$" },
+        { "name": "Miss Ko 16e", "rating": "4.3", "address": "49-51 Av. George V, 75008 Paris, France", "price": "$$$" },
+        { "name": "Yoru 11e", "rating": "4.3", "address": "62 Rue de la Roquette, 75011 Paris, France", "price": "No price level available" },
+    ],
+    "Asian": [
+        { "name": "Sweatea 3e", "rating": "4.5", "address": "61 Rue des Gravilliers, 75003 Paris, France", "price": "$$" },
+        { "name": "Neko Ramen 9e", "rating": "4.4", "address": "6 Rue de la Grange Batelière, 75009 Paris, France", "price": "$$" },
+        { "name": "Diep 8e", "rating": "3.7", "address": "55 Rue Pierre Charron, 75008 Paris, France", "price": "$$$" },
+        { "name": "Bao and me 9e", "rating": "4.7", "address": "89 Rue du Faubourg Poissonnière, 75009 Paris, France", "price": "$$" },
+        { "name": "Yummy 10e", "rating": "4.5", "address": "8 Rue du 8 Mai 1945, 75010 Paris, France", "price": "$$" },
+        { "name": "Hanoi Ca Phe 9e", "rating": "4.3", "address": "30 Bd des Italiens, 75009 Paris, France", "price": "$$" },
+        { "name": "Trantranzai 1er", "rating": "4.3", "address": "94 Rue St Denis, 75001 Paris, France", "price": "$$" },
+        { "name": "Gyoza House 9e", "rating": "4.7", "address": "20 Rue de Châteaudun, 75009 Paris, France", "price": "$$" },
+        { "name": "Delices Lepic", "rating": "4.5", "address": "14 Rue Lepic, 75018 Paris, France", "price": "$" },
+    ],
+    "Brunch": [
+        { "name": "Kozy Paris 7e", "rating": "4.7", "address": "79 Av. Bosquet, 75007 Paris, France", "price": "$$" },
+        { "name": "Love Juice Bar 7e", "rating": "4.1", "address": "176 Rue de Grenelle, 75007 Paris, France", "price": "$$" },
+        { "name": "Acaï & you 9e 11e", "rating": "4.7", "address": "11 Rue Lalande, 75014 Paris, France", "price": "No price level available" },
+        { "name": "Immersion", "rating": "4.6", "address": "8 Rue Lucien Sampaix, 75010 Paris, France", "price": "$$" },
+        { "name": "Café Foufou 11e 3e", "rating": "3.8", "address": "10 Rue Oberkampf, 75011 Paris, France", "price": "$$" },
+        { "name": "Wild & the Moon", "rating": "Not found", "address": "Not found", "price": "Not found" },
+        { "name": "Saint Pearl 7e", "rating": "4.2", "address": "38 Rue des Saints-Pères, 75007 Paris, France", "price": "$" },
+        { "name": "Eats Thyme 2e", "rating": "4.3", "address": "44 Rue Coquillière, 75001 Paris, France", "price": "No price level available" },
+        { "name": "Marcelle 7e 1e", "rating": "3.8", "address": "159 Rue de Grenelle, 75007 Paris, France", "price": "$$" },
+        { "name": "Caoua Coffee Shop 10e", "rating": "3.9", "address": "98 Quai de Jemmapes, 75010 Paris, France", "price": "No price level available" },
+        { "name": "Abattoir Vegetal 18e", "rating": "Not found", "address": "Not found", "price": "Not found" },
+        { "name": "Sunday in Soho 2e", "rating": "4.1", "address": "7 Rue Saint-Marc, 75002 Paris, France", "price": "No price level available" },
+        { "name": "5 pailles 10e", "rating": "4.6", "address": "79 Rue du Faubourg Saint-Denis, 75010 Paris, France", "price": "$$" },
+        { "name": "Season 3e 9e 11e", "rating": "Not found", "address": "Not found", "price": "Not found" },
+        { "name": "Passager Cafe 11e", "rating": "4", "address": "107 Av. Ledru Rollin, 75011 Paris, France", "price": "$$" },
+        { "name": "Madame Pampa 14e", "rating": "3.9", "address": "64 Rue du Montparnasse, 75014 Paris, France", "price": "No price level available" },
+        { "name": "Kaf Kaf 11e", "rating": "4.8", "address": "7 Rue Keller, 75011 Paris, France", "price": "$$" },
+        { "name": "Douceurs Capitales 11e", "rating": "4.7", "address": "2 Rue du Général Renault, 75011 Paris, France", "price": "No price level available" },
+        { "name": "Cafe crème 3e", "rating": "4.1", "address": "4 Rue Dupetit-Thouars, 75003 Paris, France", "price": "$$" },
+        { "name": "Bon Bouquet Cafe 9e", "rating": "4.8", "address": "30 Rue Le Peletier, 75009 Paris, France", "price": "$$" },
+        { "name": "Clint 12e", "rating": "4.6", "address": "18 Av. Ledru Rollin, 75012 Paris, France", "price": "No price level available" },
+        { "name": "46 and 3rd", "rating": "4.7", "address": "46 R. de Turbigo, 75003 Paris, France", "price": "$$" },
+        { "name": "La pépinière des Batignolles 17e", "rating": "4.2", "address": "15 Rue des Dames, 75017 Paris, France", "price": "No price level available" },
+        { "name": "Azure café 8e", "rating": "4.8", "address": "63 Rue de Ponthieu, 75008 Paris, France", "price": "$$" },
+        { "name": "Buvette 9e", "rating": "4.2", "address": "28 Rue Henry Monnier, 75009 Paris, France", "price": "$$" },
+        { "name": "O/HP/E 10e", "rating": "4.2", "address": "27 Rue du Château d'Eau, 75010 Paris, France", "price": "No price level available" },
+    ],
+    "Healthy": [
+        { "name": "Chief Paris 2e", "rating": "4.4", "address": "104 Rue Réaumur, 75002 Paris, France", "price": "No price level available" },
+    ],
+    "Libanais": [
+        { "name": "Zaytoon 13e", "rating": "4.6", "address": "2 Rue Duchefdelaville, 75013 Paris, France", "price": "No price level available" },
+        { "name": "Rimal 8e 16e", "rating": "4.4", "address": "22 Av. George V, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Noura 16e", "rating": "4.2", "address": "27 Av. Marceau, 75116 Paris, France", "price": "$$" },
+        { "name": "Saj 3e", "rating": "4.3", "address": "212 Rue Saint-Martin, 75003 Paris, France", "price": "No price level available" },
+        { "name": "Qasti 3e", "rating": "4.5", "address": "205 Rue Saint-Martin, 75003 Paris, France", "price": "$$$" },
+        { "name": "Eats Thyme 1er", "rating": "4.3", "address": "44 Rue Coquillière, 75001 Paris, France", "price": "No price level available" },
+        { "name": "Cedres", "rating": "4.8", "address": "6 Rue Mouffetard, 75005 Paris, France", "price": "$" },
+    ],
+    "Steaks": [
+        { "name": "The Grill Room 8e", "rating": "4.4", "address": "103 Bd Malesherbes, 75008 Paris, France", "price": "$$$" },
+        { "name": "Le Relais de l’entrecôte", "rating": "4.2", "address": "15 Rue Marbeuf, 75008 Paris, France", "price": "$$" },
+        { "name": "Beef Bar 8e", "rating": "4", "address": "5 Rue Marbeuf, 75008 Paris, France", "price": "$$$$" },
+        { "name": "La Brigade 8e", "rating": "4.7", "address": "25 Bd des Italiens, 75002 Paris, France", "price": "$$" },
+    ],
+    "Greek": [
+        { "name": "Kalamata 8e", "rating": "3.2", "address": "31 Rue La Boétie, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Yaya", "rating": "3.9", "address": "33 Av. Secrétan, 75019 Paris, France", "price": "$$$" },
+        { "name": "Gallika 2e 8e", "rating": "4.6", "address": "6 Rue du Commandant Rivière, 75008 Paris, France", "price": "No price level available" },
+    ],
+    "Bars": [
+        { "name": "Le Zinc 15e", "rating": "3.8", "address": "61 Av. de la Motte-Picquet, 75015 Paris, France", "price": "$$" },
+        { "name": "Bisou 3e", "rating": "4.5", "address": "15 Bd du Temple, 75003 Paris, France", "price": "$$" },
+        { "name": "Le Comptoir General 10e", "rating": "4.2", "address": "84 Quai de Jemmapes, 75010 Paris, France", "price": "$$" },
+        { "name": "La reverie 11e", "rating": "4.1", "address": "15 Rue de la Roquette, 75011 Paris, France", "price": "$$" },
+        { "name": "Lolo Cave à manger 9e", "rating": "4.2", "address": "12 Rue de Châteaudun, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Wall Street 11e", "rating": "4.5", "address": "56 Av. de la République, 75011 Paris, France", "price": "$$" },
+    ],
+    "Terraces": [
+        { "name": "Le perchoir", "rating": "4.1", "address": "14 Rue Crespin du Gast, 75011 Paris, France", "price": "$$$" },
+        { "name": "Perruche", "rating": "4.1", "address": "Printemps De L'Homme, 2 Rue du Havre 9ème étage, 75009 Paris, France", "price": "$$$$" },
+        { "name": "Tortuga 9e", "rating": "3.7", "address": "40 Bd Haussmann, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Maison Blanche 8e", "rating": "0", "address": "6B Rue Lavoisier, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Hotel National des arts et métiers 3e", "rating": "4.4", "address": "243 Rue Saint-Martin, 75003 Paris, France", "price": "No price level available" },
+        { "name": "Le Brach 16e", "rating": "4.3", "address": "1-7 Rue Jean Richepin, 75116 Paris, France", "price": "No price level available" },
+        { "name": "Mama Shelter 15e", "rating": "4.5", "address": "20 Av. de la Prte de la Plaine, 75015 Paris, France", "price": "No price level available" },
+        { "name": "Créatures 9e", "rating": "3.5", "address": "25 Rue de la Chau. d'Antin, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Laho 12e", "rating": "4", "address": "5-9 Rue Van Gogh, 75012 Paris, France", "price": "$$" },
+        { "name": "Au top 3e", "rating": "4.3", "address": "93 Rue Vieille du Temple, 75003 Paris, France", "price": "No price level available" },
+        { "name": "Pedzouille Paris 15e", "rating": "4.5", "address": "Novotel Paris Porte de Versailles, 4 Av. de la Prte de la Plaine Rooftop - 8ème étage, 75015 Paris, France", "price": "No price level available" },
+    ],
+    "Peniche": [
+        { "name": "Le Flow 7e", "rating": "3.4", "address": "4 Port des Invalides, 75007 Paris, France", "price": "$$" },
+        { "name": "Fluctuart 7e", "rating": "4.3", "address": "2 port du Gros Caillou, 75007 Paris, France", "price": "No price level available" },
+        { "name": "Rosa Bonheur 7e", "rating": "4", "address": "Port des Invalides, Quai d'Orsay, 75007 Paris, France", "price": "$$" },
+        { "name": "Le Mazette 12e", "rating": "4", "address": "69 Port de la Rapée, 75012 Paris, France", "price": "$$" },
+    ],
+    "Café": [
+        { "name": "Café Marly 1e", "rating": "3.7", "address": "93 Rue de Rivoli, 75001 Paris, France", "price": "$$$" },
+        { "name": "Café de l’Homme 16e", "rating": "3.7", "address": "17 Pl. du Trocadéro et du 11 Novembre, 75016 Paris, France", "price": "$$$$" },
+        { "name": "Café de Flore 6e", "rating": "3.9", "address": "172 Bd Saint-Germain, 75006 Paris, France", "price": "$$$" },
+        { "name": "Café Kitsuné", "rating": "4", "address": "51 Gal de Montpensier, 75001 Paris, France", "price": "$$" },
+        { "name": "Broken Biscuits 11e", "rating": "4.7", "address": "10 Pass. Rochebrune, 75011 Paris, France", "price": "No price level available" },
+        { "name": "Le Choupinet 6e", "rating": "4.3", "address": "58 Bd Saint-Michel, 75006 Paris, France", "price": "$$" },
+        { "name": "Noir Coffee Shop 8e", "rating": "4.6", "address": "120 Bd Haussmann, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Arabica", "rating": "4.3", "address": "83P Rue du Bac, 75007 Paris, France", "price": "No price level available" },
+        { "name": "Les deux magots", "rating": "4.2", "address": "6 Pl. Saint-Germain des Prés, 75006 Paris, France", "price": "$$$" },
+        { "name": "Braun notes 9e", "rating": "4.3", "address": "31-33 Rue de Mogador, 75009 Paris, France", "price": "$$" },
+        { "name": "Crosby Studios 1er", "rating": "5", "address": "8 Rue des Beaux Arts, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Keith 8e", "rating": "4.2", "address": "49 Rue Pierre Charron, 75008 Paris, France", "price": "No price level available" },
+        { "name": "Café Nuances 1er", "rating": "4.5", "address": "25 Rue Danielle Casanova, 75001 Paris, France", "price": "No price level available" },
+    ],
+    "Boulangerie": [
+        { "name": "Boulangerie Mamiche 9e", "rating": "4.6", "address": "45 Rue Condorcet, 75009 Paris, France", "price": "$" },
+        { "name": "Urban Bakery Family", "rating": "4", "address": "13 Rue Lepic, 75018 Paris, France", "price": "No price level available" },
+        { "name": "The French Bastards 11e 2e", "rating": "4.3", "address": "61 Rue Oberkampf, 75011 Paris, France", "price": "$$" },
+        { "name": "Les merveilleux 7e", "rating": "4.5", "address": "94 Rue Saint-Dominique, 75007 Paris, France", "price": "$$" },
+        { "name": "Union 9e", "rating": "4.8", "address": "2 Rue Bleue, 75009 Paris, France", "price": "No price level available" },
+        { "name": "Liberté 7e 6e", "rating": "4.2", "address": "58 Rue Saint-Dominique, 75007 Paris, France", "price": "No price level available" },
+    ],
+    "Desserts": [
+        { "name": "La quequetterie 2e", "rating": "4.1", "address": "28 Rue d'Aboukir, 75002 Paris, France", "price": "$$" },
+        { "name": "Yummy and guilt free 3e", "rating": "4.3", "address": "3 Rue du Temple, 75004 Paris, France", "price": "No price level available" },
+        { "name": "Hoct & Loca 4e", "rating": "4.3", "address": "99 Rue de la Verrerie, 75004 Paris, France", "price": "$$" },
+        { "name": "Sweet Bazar 1e", "rating": "4.4", "address": "133 Rue St Denis, 75001 Paris, France", "price": "No price level available" },
+        { "name": "Cupkie 5e", "rating": "4.5", "address": "26 Rue Monge, 75005 Paris, France", "price": "No price level available" },
+        { "name": "Snowvan 5e", "rating": "4", "address": "15 Rue Saint-Jacques, 75005 Paris, France", "price": "No price level available" },
+        { "name": "Stohrer 2e", "rating": "4.4", "address": "51 Rue Montorgueil, 75002 Paris, France", "price": "$$$" },
+        { "name": "Fruttini 6e 9e", "rating": "4.5", "address": "24 Rue Saint-Placide, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Laura Todd Cookies 6e", "rating": "5", "address": "20 Rue Saint-Placide, 75006 Paris, France", "price": "No price level available" },
+        { "name": "Bone Shaker Donuts 2e", "rating": "4.4", "address": "86 Rue d'Aboukir, 75002 Paris, France", "price": "$$" },
+        { "name": "Glazed Paris 5e 9e", "rating": "4.6", "address": "19 Rue Geoffroy-Saint-Hilaire, 75005 Paris, France", "price": "No price level available" },
+        { "name": "Cedric Grolet 9e", "rating": "3.3", "address": "35 Av. de l'Opéra, 75002 Paris, France", "price": "$$$$" },
+    ],
+    "Cool places": [
+        { "name": "Palais Galliera", "rating": "4.4", "address": "10 Av. Pierre 1er de Serbie, 75116 Paris, France", "price": "No price level available" },
+        { "name": "Baguette du relais", "rating": "4", "address": "10 Rue des Archives, 75004 Paris, France", "price": "No price level available" },
+    ],
+
+        };
+
+        const restaurantList = document.getElementById("restaurantList");
+        const categorySelect = document.getElementById("categorySelect");
+
+        // Populate category dropdown
+        for (let category in data) {
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        }
+
+        // Display restaurants
+        function displayRestaurants(filteredData) {
+            restaurantList.innerHTML = "";
+            for (let category in filteredData) {
+                const categoryTitle = document.createElement("h3");
+                categoryTitle.textContent = category;
+                categoryTitle.className = "category-title";
+                restaurantList.appendChild(categoryTitle);
+
+                filteredData[category].forEach(restaurant => {
+                    const card = document.createElement("div");
+                    card.className = "restaurant-card";
+                    card.innerHTML = `
+                        <h4>${restaurant.name}</h4>
+                        <p><strong>Rating:</strong> ${restaurant.rating}</p>
+                        <p><strong>Address:</strong> ${restaurant.address}</p>
+                        <p><strong>Price:</strong> ${restaurant.price}</p>
+                    `;
+                    restaurantList.appendChild(card);
+                });
+            }
+        }
+
+        // Filter function
+        function filterRestaurants() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const selectedCategory = categorySelect.value;
+            const filteredData = {};
+
+            for (let category in data) {
+                if (selectedCategory && category !== selectedCategory) continue;
+
+                const filteredRestaurants = data[category].filter(restaurant => 
+                    restaurant.name.toLowerCase().includes(searchInput)
+                );
+
+                if (filteredRestaurants.length) {
+                    filteredData[category] = filteredRestaurants;
+                }
+            }
+
+            displayRestaurants(filteredData);
+        }
+
+        // Initial display
+        displayRestaurants(data);
+    </script>
+
+</body>
+</html>
